@@ -1,0 +1,27 @@
+# StudyMate: AI-Powered PDF-Based Q&A System for Students
+# Hackathon Project Dependencies
+
+# Core Framework
+streamlit==1.28.1
+
+# PDF Processing
+PyMuPDF==1.23.8
+
+# AI & ML - Compatible versions
+sentence-transformers==2.2.2
+huggingface-hub==0.16.4
+transformers==4.21.3
+
+# Vector Database & Search
+faiss-cpu==1.7.4
+
+# Data Processing
+pandas==2.0.3
+numpy==1.24.3
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Development
+streamlit-option-menu==0.3.6
