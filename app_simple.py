@@ -292,7 +292,7 @@ def call_openrouter_api(prompt):
     }
     
     data = {
-        "model": "deepseek/deepseek-chat-v3.1:free",
+        "model": "deepseek/deepseek-chat",
         "messages": [
             {
                 "role": "system",
@@ -309,7 +309,7 @@ def call_openrouter_api(prompt):
     
     try:
         response = requests.post(url, headers=headers, json=data, timeout=30)
-        
+
         if response.status_code == 200:
             result = response.json()
             if 'choices' in result and len(result['choices']) > 0:
@@ -318,9 +318,75 @@ def call_openrouter_api(prompt):
                 st.error(f"❌ OpenRouter API returned empty response: {result}")
                 return None
         else:
-            st.error(f"❌ OpenRouter API Error: {response.status_code} - {response.text}")
+            # Surface common OpenRouter privacy/model errors clearly
+            try:
+                err_json = response.json()
+            except Exception:
+                err_json = response.text
+            st.error(
+                "❌ OpenRouter API error. If you see 'No endpoints found matching your data policy', either switch to a non-free model or enable Prompt Training at https://openrouter.ai/settings/privacy.\n"
+                f"Status {response.status_code}: {err_json}"
+            )
             return None
-            
+
+    except Exception as e:
+        st.error(f"❌ Error calling OpenRouter API: {str(e)}")
+        return None
+
+def call_gpt_oss_api(prompt):
+    """Call OpenRouter API for GPT-OSS-120B model (high-reasoning capabilities)"""
+    api_key = os.getenv('OPENROUTER_API_KEY')
+    
+    if not api_key:
+        st.error("❌ OpenRouter API key not found. Please check your .env file.")
+        return None
+    
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://studymate-ai.com",
+        "X-Title": "StudyMate AI"
+    }
+    
+    data = {
+        "model": "qwen/qwen-2.5-72b-instruct",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are an expert academic assistant with high reasoning capabilities. Provide detailed, well-structured answers with logical flow and clear explanations."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "max_tokens": 1000,
+        "temperature": 0.7
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+
+        if response.status_code == 200:
+            result = response.json()
+            if result.get('choices') and len(result['choices']) > 0:
+                return result['choices'][0]['message']['content']
+            else:
+                st.error(f"❌ OpenRouter (Qwen) API returned empty response: {result}")
+                return None
+        else:
+            try:
+                err_json = response.json()
+            except Exception:
+                err_json = response.text
+            st.error(
+                "❌ Model unavailable under current data policy. Consider enabling Prompt Training at https://openrouter.ai/settings/privacy or switch to another model (e.g., meta-llama/llama-3.1-70b-instruct).\n"
+                f"Status {response.status_code}: {err_json}"
+            )
+            return None
+
     except Exception as e:
         st.error(f"❌ Error calling OpenRouter API: {str(e)}")
         return None
@@ -329,9 +395,9 @@ def main():
     # Header
     st.markdown("""
     <div class="main-header">
-        <h1>🎓 StudyMate</h1>
-        <h3>AI-Powered PDF-Based Q&A System for Students</h3>
-        <p>Upload your study materials and ask questions in natural language</p>
+        <h1>🧠 StudyMate TripleMind</h1>
+        <h3>AI-Powered PDF-Based Q&A System with Triple AI Models</h3>
+        <p>📚 PDF-Specific (Gemini) + 🌍 Global Knowledge (DeepSeek) + 🤖 High Reasoning (GPT-OSS-120B)</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -425,25 +491,36 @@ def main():
             help="Ask any question - get both PDF-specific and global knowledge answers!"
         )
         
-        # Answer type selection
-        checkbox_col1, checkbox_col2, checkbox_col3 = st.columns([1, 1, 1])
-        with checkbox_col1:
-            pdf_only = st.checkbox("📚 PDF Only", value=False, help="Get answer only from uploaded documents")
-        with checkbox_col2:
-            global_only = st.checkbox("🌍 DeepSeek Only", value=False, help="Get answer only from DeepSeek AI (general knowledge)")
-        with checkbox_col3:
-            both_types = st.checkbox("🎯 Both Types", value=True, help="Get both PDF-specific and global knowledge answers")
+        # TripleMind Model Selection
+        st.subheader("🧠 TripleMind AI Models")
+        
+        # Model selection checkboxes
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            pdf_only = st.checkbox("📚 PDF Only (Gemini)", value=False, help="Get answer only from uploaded documents using Google Gemini")
+        with col2:
+            deepseek_only = st.checkbox("🌍 DeepSeek Only", value=False, help="Get answer only from DeepSeek AI (general knowledge)")
+        with col3:
+            gpt_oss_only = st.checkbox("🤖 GPT-OSS Only", value=False, help="Get answer only from GPT-OSS-120B (high reasoning)")
+        
+        # TripleMind combination options
+        st.markdown("**🎯 TripleMind Combinations:**")
+        triple_col1, triple_col2, triple_col3 = st.columns([1, 1, 1])
+        with triple_col1:
+            gemini_deepseek = st.checkbox("📚+🌍 Gemini + DeepSeek", value=False, help="PDF-specific + Global knowledge")
+        with triple_col2:
+            gemini_gptoss = st.checkbox("📚+🤖 Gemini + GPT-OSS", value=False, help="PDF-specific + High reasoning")
+        with triple_col3:
+            all_three = st.checkbox("🧠 All Three Minds", value=False, help="Complete TripleMind: PDF + Global + Reasoning")
         
         # Ensure only one option is selected
-        if pdf_only:
-            global_only = False
-            both_types = False
-        elif global_only:
-            pdf_only = False
-            both_types = False
-        elif both_types:
-            pdf_only = False
-            global_only = False
+        selected_options = [pdf_only, deepseek_only, gpt_oss_only, gemini_deepseek, gemini_gptoss, all_three]
+        if sum(selected_options) > 1:
+            st.warning("⚠️ Please select only one option")
+            return
+        elif sum(selected_options) == 0:
+            # Default to PDF-only to avoid OpenRouter errors when user has no credits
+            pdf_only = True
         
         if question and st.button("🚀 Get Answer", type="primary"):
             with st.spinner("🤔 Thinking..."):
@@ -452,69 +529,94 @@ def main():
                 global_response = None
                 citations = []
                 
-                # 1. Get PDF-specific answer (if requested and documents are uploaded)
-                if (pdf_only or both_types) and st.session_state.pdf_texts:
-                    # Create chunks with metadata for citations
-                    all_chunks = []
-                    for doc in st.session_state.pdf_texts:
-                        if 'pages_data' in doc:
-                            chunks = create_chunks_with_metadata(doc['pages_data'])
-                            for chunk in chunks:
-                                chunk['doc'] = doc['filename']  # Ensure filename is set
-                            all_chunks.extend(chunks)
-                    
-                    # Get PDF-specific response with citations
-                    pdf_response = call_gemini_api(question, all_chunks)
-                    if pdf_response:
-                        citations = parse_citations(pdf_response)
-                elif pdf_only and not st.session_state.pdf_texts:
-                    st.warning("⚠️ No PDFs uploaded. Please upload documents first for PDF-specific answers.")
-                    return
+                # Initialize response variables
+                pdf_response = None
+                deepseek_response = None
+                gpt_oss_response = None
+                citations = []
                 
-                # 2. Get global knowledge answer from OpenRouter DeepSeek (if requested)
-                if global_only or both_types:
-                    global_response = call_openrouter_api(question)
-                    if global_response:
+                # 1. Get PDF-specific answer from Gemini (if requested)
+                if pdf_only or gemini_deepseek or gemini_gptoss or all_three:
+                    if st.session_state.pdf_texts:
+                        # Create chunks with metadata for citations
+                        all_chunks = []
+                        for doc in st.session_state.pdf_texts:
+                            if 'pages_data' in doc:
+                                chunks = create_chunks_with_metadata(doc['pages_data'])
+                                for chunk in chunks:
+                                    chunk['doc'] = doc['filename']
+                                all_chunks.extend(chunks)
+                        
+                        # Get PDF-specific response with citations
+                        pdf_response = call_gemini_api(question, all_chunks)
+                        if pdf_response:
+                            citations = parse_citations(pdf_response)
+                    else:
+                        st.warning("⚠️ No PDFs uploaded. Please upload documents first for PDF-specific answers.")
+                        if pdf_only:
+                            return
+                
+                # 2. Get global knowledge answer from DeepSeek (if requested)
+                if deepseek_only or gemini_deepseek or all_three:
+                    deepseek_response = call_openrouter_api(question)
+                    if deepseek_response:
                         st.success("✅ DeepSeek AI response received!")
                     else:
                         st.error("❌ DeepSeek AI response failed!")
                 
-                # 3. Combine responses and add to chat history
-                if pdf_response or global_response:
+                # 3. Get high-reasoning answer from GPT-OSS-120B (if requested)
+                if gpt_oss_only or gemini_gptoss or all_three:
+                    gpt_oss_response = call_gpt_oss_api(question)
+                    if gpt_oss_response:
+                        st.success("✅ GPT-OSS-120B response received!")
+                    else:
+                        st.error("❌ GPT-OSS-120B response failed!")
+                
+                # 4. Combine responses and add to chat history
+                if pdf_response or deepseek_response or gpt_oss_response:
                     # Create combined response based on user choice
                     combined_response = ""
                     response_type = []
                     
                     if pdf_response:
-                        combined_response += f"📚 **PDF-Specific Answer:**\n{pdf_response}\n\n"
+                        combined_response += f"📚 **PDF-Specific Answer (Gemini):**\n{pdf_response}\n\n"
                         response_type.append("PDF")
                     
-                    if global_response:
-                        combined_response += f"🌍 **Global Knowledge (DeepSeek):**\n{global_response}\n\n"
-                        response_type.append("Global")
+                    if deepseek_response:
+                        combined_response += f"🌍 **Global Knowledge (DeepSeek):**\n{deepseek_response}\n\n"
+                        response_type.append("DeepSeek")
+                    
+                    if gpt_oss_response:
+                        combined_response += f"🤖 **High Reasoning (GPT-OSS-120B):**\n{gpt_oss_response}\n\n"
+                        response_type.append("GPT-OSS")
                     
                     # Add to chat history
                     st.session_state.chat_history.append({
                         'question': question,
                         'answer': combined_response,
                         'citations': citations,
-                        
                         'response_type': response_type,
                         'timestamp': datetime.now().strftime("%H:%M")
                     })
                     
-                    # Show success message
-                    if len(response_type) == 2:
-                        st.success("✅ Both PDF-specific and DeepSeek answers generated!")
+                    # Show success message based on response type
+                    if len(response_type) == 3:
+                        st.success("🧠 **TripleMind Complete:** PDF + Global + Reasoning!")
+                    elif len(response_type) == 2:
+                        st.success(f"🎯 **Dual Response:** {' + '.join(response_type)}")
                     elif "PDF" in response_type:
                         st.success("✅ PDF-specific answer generated with citations!")
-                    else:
+                    elif "DeepSeek" in response_type:
                         st.success("✅ DeepSeek AI answer generated!")
+                    elif "GPT-OSS" in response_type:
+                        st.success("✅ GPT-OSS-120B answer generated!")
                     
                     st.experimental_rerun()
                 else:
                     # Better error handling for different scenarios
-                    if global_only and not global_response:
+                    if gpt_oss_only and not gpt_oss_response:
+                        st.error("❌ Failed to get GPT-OSS-120B response. Please check your OpenRouter API key and try again.")
+                    elif deepseek_only and not deepseek_response:
                         st.error("❌ Failed to get DeepSeek AI response. Please check your OpenRouter API key and try again.")
                     elif pdf_only and not pdf_response:
                         st.error("❌ Failed to get PDF-specific response. Please check your Google API key and try again.")
@@ -534,12 +636,16 @@ def main():
                     # Show response type indicators
                     if 'response_type' in chat:
                         response_types = chat['response_type']
-                        if len(response_types) == 2:
-                            st.success("🎯 **Dual Response:** PDF-specific + DeepSeek AI")
+                        if len(response_types) == 3:
+                            st.success("🧠 **TripleMind Complete:** PDF + Global + Reasoning")
+                        elif len(response_types) == 2:
+                            st.success(f"🎯 **Dual Response:** {' + '.join(response_types)}")
                         elif "PDF" in response_types:
-                            st.info("📚 **PDF Response:** Based on uploaded documents")
-                        elif "Global" in response_types:
+                            st.info("📚 **PDF Response:** Based on uploaded documents (Gemini)")
+                        elif "DeepSeek" in response_types:
                             st.info("🌍 **DeepSeek Response:** AI-powered general knowledge")
+                        elif "GPT-OSS" in response_types:
+                            st.info("🤖 **GPT-OSS Response:** High-reasoning capabilities")
                     
                     # Display sources if citations exist
                     if 'citations' in chat and chat['citations']:
@@ -588,8 +694,11 @@ def main():
             st.subheader("🔧 Technology Stack")
             st.write("• Python + Streamlit")
             st.write("• PyMuPDF (PDF Processing)")
-            st.write("• Google Gemini AI")
-            st.write("• OpenRouter + DeepSeek AI")
+            st.write("• 🧠 **TripleMind AI Models:**")
+            st.write("  - 📚 Google Gemini AI (PDF-specific)")
+            st.write("  - 🌍 DeepSeek AI (Global knowledge)")
+            st.write("  - 🤖 GPT-OSS-120B (High reasoning)")
+            st.write("• OpenRouter API Integration")
             st.write("• Modern Web Interface")
         
         st.markdown("---")
