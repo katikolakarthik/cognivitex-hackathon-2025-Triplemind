@@ -13,6 +13,26 @@
 
 </div>
 
+## 🖼️ **Visual Showcase**
+
+<div align="center">
+
+### 🧠 **TripleMind MVP in Action**
+
+![TripleMind Interface](screenshots_triplemind/triplemind1.png)
+
+*Clean, intuitive interface for AI-powered PDF Q&A with multi-model intelligence*
+
+---
+
+### 🚀 **StudyMate Advanced Features**
+
+![StudyMate Advanced](screenshots_triplemind/advaced_studymate_1.png)
+
+*Enterprise-grade RAG system with FAISS vector search and IBM Watsonx*
+
+</div>
+
 ## 🎯 Live Demo
 
 > **🚀 Try StudyMate Right Now!** 
@@ -21,31 +41,36 @@
 
 ### Demo Screenshots
 
-<details>
-<summary>📱 Main Interface & Document Upload</summary>
+<div align="center">
 
-![Main Interface](https://via.placeholder.com/800x400/4A90E2/FFFFFF?text=Main+Interface+%26+Document+Upload)
-*Clean, intuitive interface for uploading PDFs and asking questions*
+#### 🧠 **TripleMind MVP - Multi-Model AI Innovation**
 
-</details>
+![TripleMind Main Interface](screenshots_triplemind/triplemind1.png)
+*Main interface showcasing the clean, intuitive design for PDF uploads and AI-powered Q&A*
 
-<details>
-<summary>🔍 Question & Answer Interface</summary>
+![TripleMind Document Processing](screenshots_triplemind/Triplemind2.png)
+*Document processing and text extraction with intelligent chunking system*
 
-![Q&A Interface](https://via.placeholder.com/800x400/50C878/FFFFFF?text=Question+%26+Answer+Interface)
-*Interactive Q&A with source citations and context*
+![TripleMind AI Model Selection](screenshots_triplemind/triplemind3.png)
+*Multi-model AI orchestration - Google Gemini, DeepSeek AI, and GPT-OSS-120B working together*
 
-</details>
+![TripleMind Q&A Interface](screenshots_triplemind/triplemind4.png)
+*Interactive Q&A interface with source citations and context-aware responses*
 
-<details>
-<summary>📊 Multi-Document Management</summary>
+#### 🚀 **StudyMate Advanced - Enterprise-Grade RAG System**
 
-![Document Management](https://via.placeholder.com/800x400/FF6B6B/FFFFFF?text=Multi-Document+Management)
-*Efficiently manage and query multiple study materials*
+![StudyMate Advanced Interface](screenshots_triplemind/advaced_studymate_1.png)
+*Advanced RAG interface with FAISS vector search and IBM Watsonx integration*
 
-</details>
+![StudyMate Advanced Features](screenshots_triplemind/advanced_studymate_2.png)
+*Enterprise-grade features including semantic search and performance metrics*
 
-> **💡 Pro Tip:** Replace the placeholder images above with actual screenshots of your application for maximum impact!
+![StudyMate Advanced Performance](screenshots_triplemind/studymate_advanced3.png)
+*Performance dashboard and advanced analytics for enterprise deployment*
+
+</div>
+
+> **🎯 These screenshots showcase both our TripleMind MVP (multi-model AI) and StudyMate Advanced (enterprise RAG) solutions!**
 
 ## 🎓 Project Overview
 
