@@ -437,7 +437,7 @@ This project is created for educational and hackathon purposes.
 
 **⭐ Star this repository if StudyMate helps your learning journey! ⭐**
 
-**🧠 Built by TripleMind Team with ❤️ during TKR HACKATHON 2025 2025**
+**🧠 Built by TripleMind Team with ❤️ during TKR HACKATHON 2025**
 
 **🏆 Showcasing Multi-Model AI Innovation & Technical Excellence**
 

@@ -1,0 +1,37 @@
+# StudyMate Deployment Requirements
+# TripleMind Team - Hackathon Project
+
+# Core Streamlit
+streamlit>=1.28.0
+
+# PDF Processing
+PyMuPDF>=1.23.0
+fitz>=0.0.1.dev2
+
+# AI and ML
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# HTTP and API
+requests>=2.31.0
+httpx>=0.24.0
+
+# Data Processing
+python-dotenv>=1.0.0
+Pillow>=10.0.0
+
+# Utilities
+pathlib2>=2.3.0
+typing-extensions>=4.7.0
+
+# Optional: For advanced features
+# transformers>=4.30.0
+# torch>=2.0.0
+# accelerate>=0.20.0
+
+# Development and Testing
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
