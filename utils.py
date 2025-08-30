@@ -114,9 +114,9 @@ def validate_pdf_file(file_path: str) -> bool:
         if not os.path.exists(file_path) or not os.access(file_path, os.R_OK):
             return False
         
-        # Check file size (max 50MB)
+        # Check file size (max 900MB)
         file_size = os.path.getsize(file_path)
-        if file_size > 50 * 1024 * 1024:  # 50MB
+        if file_size > 900 * 1024 * 1024:  # 900MB
             return False
         
         return True

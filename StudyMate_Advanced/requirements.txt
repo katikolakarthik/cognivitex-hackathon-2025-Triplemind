@@ -1,0 +1,30 @@
+# StudyMate Advanced: AI-Powered PDF-Based Q&A System with Advanced RAG
+# Hackathon Project - TripleMind Team
+
+# Core Framework
+streamlit==1.32.0
+
+# PDF Processing
+PyMuPDF==1.23.8
+
+# AI & ML - Advanced RAG Components
+sentence-transformers==2.2.2
+huggingface-hub==0.16.4
+transformers==4.35.0
+
+# Vector Database & Semantic Search
+faiss-cpu==1.7.4
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.2
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+
+# IBM Watsonx Integration
+ibm-watsonx-ai==1.3.36
+
+# Development
+streamlit-option-menu==0.3.6

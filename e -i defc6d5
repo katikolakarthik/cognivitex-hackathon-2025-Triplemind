@@ -1,3 +1,0 @@
-[33me252fea[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Fix security issue: Remove API keys from .env and add .gitignore
-[33mba15836[m new
-[33mdefc6d5[m[33m ([m[1;31morigin/main[m[33m)[m first commit

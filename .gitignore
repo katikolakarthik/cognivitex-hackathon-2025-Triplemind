@@ -22,6 +22,7 @@ __pycache__/
 env/
 venv/
 .venv/
+StudyMate_C
 
 # IDE files
 .vscode/
